@@ -13,7 +13,7 @@ After entering the data source to import, you will be prompted to input the foll
 ---
 # Data
 The datasets which come preloaded in the data folder is as such
-* (2016 Trump campaign speeches)[https://raw.githubusercontent.com/ryanmcdermott/trump-speeches/master/speeches.txt] - filename "trump"
-* (Several Shakespeare plays)[https://www.cs.princeton.edu/courses/archive/spring20/cos302/files/shakespeare.txt] - filename "shakespeare
-* (The Book of Psalms)[https://www.cs.princeton.edu/~bwk/tpop.webpage/psalms.txt] - filename "psalms"
+* [2016 Trump campaign speeches](https://raw.githubusercontent.com/ryanmcdermott/trump-speeches/master/speeches.txt) - filename "trump"
+* [Several Shakespeare plays](https://www.cs.princeton.edu/courses/archive/spring20/cos302/files/shakespeare.txt) - filename "shakespeare
+* [The Book of Psalms](https://www.cs.princeton.edu/~bwk/tpop.webpage/psalms.txt) - filename "psalms"
 If you find any more interesting datasets that you think work well with this model, contact me and I'll add them to the preloaded sets
