@@ -2,31 +2,32 @@ from random import choice, choices
 import re
 import pickle
 
-
-weights = [7 , 25 , 15]
-
-# Read bundle
-with open('bundle.pkl', 'rb') as file:
-    bundle = pickle.load(file)
+# Read dataset
+with open('dataset.pkl', 'rb') as f:
+    data = pickle.load(f)
+bundle = data[0]
+weights = data[1]
+soft_max = data[2]
+poetry = data[3]
 
 # Punctuation banks
 punctuation_symbols = ('.', '!', '?')
-honorifics = {
+honorifics = (
     'mr.', 'ms.', 'mrs.', 'mx.', 'dr.', 'prof.', 'capt.', 'gen.', 'gov.',
     'sen.', 'st.', 'rev.', 'hon.', 'jr.', 'sr.', 'ph.d.', 'phd.', 'm.d.',
     'b.a.', 'm.a.', 'd.d.s.'
-}
-other_abbreviations = {
+)
+other_abbreviations = (
     'etc.', 'a.m.', 'p.m.', 'vol.', 'inc.', 'co.', 'corp.', 'ltd.', 'www.'
-}
+)
 repeating_symbols = {'.' : 2, ',' : 2}                              # Number is the minimum number of repetitions
 
-# [!] Always place pairs that contain another punctuation first
+# Always place pairs that contain another punctuation first
 homo_punc = (
-    '"', '\'', '\\*', '**', '*', '`', '~~', '__'                    # Homogenous pairs have identical opens and closes
+    '"', '\'', '```', '`','***', '**', '*', '~~', '__', '||'        # Homogenous pairs have identical opens and closes
 )
 hetero_punc = (
-    ('(<', '>)'), ('(', ')'), ('[', ']'), ('{', '}'), ('«', '»')    # Heterogenous pairs have different opens and closes
+    ('(', ')'), ('[', ']'), ('{', '}'), ('«', '»')                  # Heterogenous pairs have different opens and closes
 )
 any_text = fr'(?<=[A-Za-z0-9{0}])[A-Za-z0-9{0}]'.format(punctuation_symbols)
 
@@ -91,11 +92,8 @@ def paired_punc_close(text):
     return text
 
 
-#-------------------------
-
-
 # Generate text
-def generatetext(weights, soft_max):
+def generatetext():
     text = 'Line::'
         
     for i in range(1000):
@@ -115,7 +113,7 @@ def generatetext(weights, soft_max):
                     thread = (bundle[i - 1][memory])
                     break
             
-        #Reset on failure
+        # Reset on failure
         if not thread:
             text = 'Line::'
             continue
@@ -124,15 +122,12 @@ def generatetext(weights, soft_max):
         text += f' {w}'
                 
         # Break
-        if text.count('Line::') > 1 or (len(text.split()) > soft_max + 1 and end_punc_check(w)):
-            text = text.replace('Line:: ', '').replace('Line::', '')
+        if (text.count('Line::') > 1 and not poetry) or (len(text.split()) > soft_max + 1 and end_punc_check(w)):
+            text = text.replace('Line::', '').strip()
             text = paired_punc_close(text)
             break
     
     return text
-
-
-#-------------------------
 
 
 # Main execution
@@ -141,8 +136,12 @@ print("\t--[Generator Online]--")
 while True:
     prompt = input('')
     
-    # Index search
     if prompt != '':
+        if prompt.casefold() == 'exit':
+            print('\tExiting...\n')
+            break
+        
+        # Index search
         index = tuple(prompt.split())
         chain = len(index) - 1
 
@@ -152,4 +151,4 @@ while True:
             print('\tIndex not found')
 
     else:
-        print(generatetext(weights, 10))
+        print(generatetext())
