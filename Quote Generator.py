@@ -8,7 +8,7 @@ with open('dataset.pkl', 'rb') as f:
 bundle = data[0]
 weights = data[1]
 soft_max = data[2]
-poetry = data[3]
+lined = data[3]
 
 # Punctuation banks
 punctuation_symbols = ('.', '!', '?')
@@ -122,7 +122,7 @@ def generatetext():
         text += f' {w}'
                 
         # Break
-        if (text.count('Line::') > 1 and not poetry) or (len(text.split()) > soft_max + 1 and end_punc_check(w)):
+        if (text.count('Line::') > 1 and not lined) or (len(text.split()) > soft_max + 1 and end_punc_check(w)):
             text = text.replace('Line::', '').strip()
             text = paired_punc_close(text)
             break

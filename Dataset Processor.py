@@ -3,10 +3,6 @@ from collections import defaultdict
 from time import time
 import pickle
 
-'''
-TIP: it is best to make your middle weights the biggest, and your first weights the smallest
-Trump default: 3 length, weight [7, 25, 15], curb 10
-'''
 
 # Inputs
 data_source = input('\nImport: ')
@@ -21,10 +17,10 @@ for i in range(max_len):
 #soft_max = int(input('Character curb: '))
 soft_max = 10
 
-if(input('Poetry formatting (y/n): ').casefold() == 'y'):
-    poetry = True
+if(input('Line delimited (y/n): ').casefold() == 'n'):
+    lined = False
 else:
-    poetry = False
+    lined = True
 
 
 # Fetch and process the corpus data
@@ -42,21 +38,27 @@ else:
 
 # Processes the data line-by-line
 corpus = []
-lines = 0
+line_count = 0
 
 for line in text:
     if(data_is_url):
         line = line.decode('utf-8')
-    line = line.replace('\r', '\n')
-    if not poetry:
-        line = line.replace('\n', ' ')
+    line = line.replace('\r', ' ').replace('\n', ' ')
     
-    if not line.strip():                                          # Skips empty lines
+    if not line.strip():                                # Skips empty lines
         continue
     
-    line = ['Line::'] + [w for w in line.split() if w.strip()]    # Adds sentinel, removes whitespace
+    line = [w for w in line.split() if w.strip()]       # Removes whitespace
+    
+    if lined:
+        line = ['Line::'] + line                        # Adds sentinel (lined)
+    
+    else:
+        if line[len(line) - 1].endswith(('.', '!', '?')):
+            line = line + ['Line::']                    # Adds sentinel (nonlined)
+            
     corpus.extend(line)
-    lines += 1
+    line_count += 1
 
 
 # Build the chain(s)
@@ -76,13 +78,13 @@ for memory in range(1, max_len + 1):        # Creates chains of every length up 
     
 # Save bundle
 with open('dataset.pkl', 'wb') as f:
-    pickle.dump([bundle, weights, soft_max, poetry], f)
+    pickle.dump([bundle, weights, soft_max, lined], f)
 
 
 # Display
 print("Done!\n")
 
 print('{0} ms'.format(round((time() - start_time) * 1000)))
-print('Lines: {0}'.format(lines))
+print('Lines: {0}'.format(line_count))
 print('Corpus: {0}'.format(len(corpus)))
 print()
