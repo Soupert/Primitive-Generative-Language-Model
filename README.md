@@ -1,5 +1,8 @@
 # Primitive-Generative-Language-Model
-A primitive, lightweight, memoryless language model built off of Markov chains. Use the Dataset Processor to compile the data into a file and the Quote Generator to generate a quote from it. Discord integration sometime maybe
+A primitive, lightweight language model built off of Markov chains.
+Use the Dataset Processor to compile the data into a file and the Quote Generator to generate a quote from it.
+A default compiled dataset is included, but be aware that every time you run the Dataset Processor it will overwrite the previous one.
+Discord integration sometime maybe.
 
 ---
 # Instructions
