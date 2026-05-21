@@ -1,6 +1,7 @@
 from random import choice, choices
 import re
 import pickle
+from urllib.request import urlopen
 
 # Read dataset
 with open('dataset.pkl', 'rb') as f:
@@ -9,6 +10,7 @@ bundle = data[0]
 weights = data[1]
 soft_max = data[2]
 lined = data[3]
+source = data[4]
 
 # Punctuation banks
 punctuation_symbols = ('.', '!', '?')
@@ -99,14 +101,16 @@ def generatetext():
     for i in range(1000):
         thread = []
         words = text.split()
+        weight_log = []
 
         # Build the wordbank
-        wordbank = choices(    
+        chosen_weight = choices(    
                 range(len(bundle)),
                 weights
             )[0]
+        weight_log.append(chosen_weight)
         
-        for i in range(wordbank + 1, 0, -1):
+        for i in range(chosen_weight + 1, 0, -1):
             if len(words) >= i:
                 memory = tuple(words[-i:])
                 if memory in bundle[i - 1]:
@@ -122,33 +126,43 @@ def generatetext():
         text += f' {w}'
                 
         # Break
-        if (text.count('Line::') > 1 and not lined) or (len(text.split()) > soft_max + 1 and end_punc_check(w)):
+        if (text.count('Line::') > 1 and lined) or (len(text.split()) > soft_max and end_punc_check(w)):
             text = text.replace('Line::', '').strip()
             text = paired_punc_close(text)
-            break
-    
-    return text
+            return text, weight_log
 
 
 # Main execution
 print("\t--[Generator Online]--")
+source_open = False
 
 while True:
-    prompt = input('')
-    
-    if prompt != '':
-        if prompt.casefold() == 'exit':
-            print('\tExiting...\n')
-            break
+    user_input = input('')
+    if user_input != '':
         
+        # Debug commands
+        if user_input.startswith('::'):
+            if user_input.casefold() == '::exit':
+                print('\tExiting...\n')
+                break
+            
+            if user_input.casefold() == '::data':
+                print('\tSource: {0}\n\tWeights: {1}\n\tLine delimited: {2}'.format(source, weights, lined))
+                        
+            if user_input.casefold() == '::weights':    #FIX
+                print('\t'+ str(weight_log))
+                
         # Index search
-        index = tuple(prompt.split())
-        chain = len(index) - 1
-
-        if index in bundle[chain]:
-            print(f'\t{index} -> {bundle[chain][index]}')
         else:
-            print('\tIndex not found')
+            index = tuple(user_input.split())
+            chain = len(index) - 1
 
+            if index in bundle[chain]:
+                print(f'\t{index} -> {bundle[chain][index]}')
+            else:
+                print('\tIndex not found')
+
+    # Generate
     else:
-        print(generatetext())
+        text, weight_log= generatetext()
+        print(text)

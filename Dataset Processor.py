@@ -3,29 +3,8 @@ from collections import defaultdict
 from time import time
 import pickle
 
-
-# Inputs
+# Import data
 data_source = input('\nImport: ')
-max_len = int(input('Max chain length: '))
-
-weights = []
-for i in range(max_len):
-    weights.append(int(input('\tWeight {0}: '.format(i+1))))
-    if weights[i] <= 0:
-        weights[i] = 0.1
-    
-#soft_max = int(input('Character curb: '))
-soft_max = 10
-
-if(input('Line delimited (y/n): ').casefold() == 'n'):
-    lined = False
-else:
-    lined = True
-
-
-# Fetch and process the corpus data
-print("\nProcessing...")
-start_time = time()
 
 if(data_source.startswith('http://') or data_source.startswith('https://')):
     text = urlopen(data_source)
@@ -35,8 +14,26 @@ else:
     text = open(data_source, encoding='utf-8', errors='replace')
     data_is_url = False
 
+# Parameters
+max_len = int(input('Max chain length: '))
+
+weights = []
+for i in range(max_len):
+    weights.append(int(input('\tWeight {0}: '.format(i+1))))
+    if weights[i] <= 0:
+        weights[i] = 0.1
+    
+soft_max = int(input('Word soft-maximum: '))
+
+if(input('Line delimited (y/n): ').casefold() == 'n'):
+    lined = False
+else:
+    lined = True
 
 # Processes the data line-by-line
+print("\nProcessing...")
+start_time = time()
+
 corpus = []
 line_count = 0
 
@@ -78,13 +75,12 @@ for memory in range(1, max_len + 1):        # Creates chains of every length up 
     
 # Save bundle
 with open('dataset.pkl', 'wb') as f:
-    pickle.dump([bundle, weights, soft_max, lined], f)
+    pickle.dump([bundle, weights, soft_max, lined, data_source], f)
 
 
 # Display
 print("Done!\n")
 
-print('{0} ms'.format(round((time() - start_time) * 1000)))
+print('{0} seconds'.format(round((time() - start_time), 3)))
 print('Lines: {0}'.format(line_count))
-print('Corpus: {0}'.format(len(corpus)))
-print()
+input('Corpus: {0}\n'.format(len(corpus)))
